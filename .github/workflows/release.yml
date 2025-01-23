@@ -1,0 +1,122 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+permissions: write-all
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+          cache: true
+      
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build binaries
+        run: |
+          mkdir -p dist
+          # Linux
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o dist/secure-env-linux-amd64
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-w -s" -o dist/secure-env-linux-arm64
+          
+          # macOS
+          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-w -s" -o dist/secure-env-darwin-amd64
+          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-w -s" -o dist/secure-env-darwin-arm64
+          
+          # Windows
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-w -s" -o dist/secure-env-windows-amd64.exe
+
+      - name: Generate SHA-256 checksums
+        id: sha
+        run: |
+          cd dist
+          echo "hashes<<EOF" >> $GITHUB_OUTPUT
+          sha256sum * >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: dist/*
+          body: |
+            ## Secure ENV Manager ${{ github.ref_name }}
+            
+            ### Installation
+            
+            #### Using Docker:
+            ```bash
+            docker pull ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+            ```
+            
+            #### Using binary:
+            Download the appropriate binary for your system from the assets below.
+            
+            ### SHA-256 Checksums
+            ```
+            ${{ steps.sha.outputs.hashes }}
+            ``` 
