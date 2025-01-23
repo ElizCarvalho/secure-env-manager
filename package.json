@@ -1,0 +1,14 @@
+{
+  "name": "secure-env",
+  "version": "1.0.0",
+  "scripts": {
+    "prerelease": "git fetch --tags && git pull origin $(git branch --show-current)",
+    "release:major": "npm run prerelease && standard-version --release-as major && npm run postrelease",
+    "release:minor": "npm run prerelease && standard-version --release-as minor && npm run postrelease",
+    "release:patch": "npm run prerelease && standard-version --release-as patch && npm run postrelease",
+    "postrelease": "git push origin $(git branch --show-current) && git push origin --tags"
+  },
+  "devDependencies": {
+    "standard-version": "^9.5.0"
+  }
+} 
