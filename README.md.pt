@@ -1,0 +1,105 @@
+# Secure ENV Manager
+
+Uma ferramenta CLI para gerenciar arquivos .env de forma segura usando criptografia AES-GCM.
+
+## Executando o Programa
+
+1. Clone o repositório:
+```bash
+git clone [repo-url]
+cd secure-env-manager
+```
+
+2. Execute o programa:
+```bash
+make run USER=username PASS=password
+```
+
+**Importante:** 
+- Use as credenciais compartilhadas da equipe. Todos devem usar as mesmas credenciais para garantir que possam descriptografar os arquivos uns dos outros.
+- O arquivo `config.json` é protegido contra alterações (somente leitura) para garantir a integridade das credenciais.
+- Obtenha as credenciais com sua equipe antes de usar o programa.
+
+## Como Usar
+
+O programa oferece duas operações principais:
+
+1. Criptografar arquivo .env:
+```bash
+make run USER=username PASS=password
+# Escolha a opção 1
+# Digite o nome do projeto (ex: meuprojeto)
+# Digite o caminho para o arquivo .env a ser criptografado (ex: ~/dev/meuprojeto/.env)
+```
+
+2. Descriptografar arquivo:
+```bash
+make run USER=username PASS=password
+# Escolha a opção 2
+# Digite o nome do projeto
+# Digite o caminho para o arquivo a ser atualizado (ex: ~/dev/meuprojeto/.env)
+```
+
+## Desinstalação
+
+Para remover completamente o programa:
+```bash
+make uninstall
+```
+
+## Estrutura de Arquivos
+
+```
+secure-env-manager/
+├── cmd/
+│   └── secure-env/     # Ponto de entrada da aplicação
+│       ├── main.go
+│       └── main_test.go
+├── internal/
+│   ├── config/         # Configuração da aplicação
+│   │   ├── config.go
+│   │   └── config_test.go
+│   ├── crypto/         # Funções de criptografia
+│   │   ├── crypto.go
+│   │   └── crypto_test.go
+│   └── handler/        # Manipuladores de comandos
+│       ├── handler.go
+│       └── handler_test.go
+├── test-output/        # Relatórios de cobertura de testes
+├── .cache/            # Cache do Go (ignorado pelo Git)
+├── Dockerfile         # Configuração do container
+├── Makefile          # Comandos de automação
+├── go.mod            # Dependências do Go
+├── go.sum            # Checksums das dependências
+└── README.md         # Este arquivo
+```
+
+## Segurança
+
+- Credenciais compartilhadas pela equipe
+- Criptografia AES-GCM para arquivos .env
+- Senha também usada como chave de criptografia
+- Arquivos descriptografados automaticamente ignorados pelo Git
+- Arquivo de credenciais protegido contra alterações
+
+## Comandos Make
+
+```bash
+make run USER=username PASS=password  # Executar o programa
+make uninstall                       # Remover o programa
+make help                           # Mostrar ajuda
+```
+
+## Requisitos
+
+- Docker 
+
+## Contribuindo
+
+Adoramos contribuições da nossa comunidade! Se você quiser contribuir com o projeto:
+
+1. Leia nosso [Guia de Contribuição](CONTRIBUTING.md.pt) para entender nosso processo de desenvolvimento
+2. Aprenda sobre nosso padrão de commits semânticos que usamos para automatizar releases
+3. Faça um fork do projeto e envie seu Pull Request!
+
+Todas as contribuições são bem-vindas, desde correções na documentação até novas funcionalidades. 

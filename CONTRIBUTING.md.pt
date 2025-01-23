@@ -1,0 +1,101 @@
+# Contribuindo com o Secure ENV Manager
+
+Adoramos sua contribuição! Queremos tornar a contribuição para o Secure ENV Manager o mais fácil e transparente possível, seja:
+
+- Reportando um bug
+- Discutindo o estado atual do código
+- Enviando uma correção
+- Propondo novas funcionalidades
+- Se tornando um mantenedor
+
+## Processo de Desenvolvimento
+
+Usamos o GitHub para hospedar código, rastrear issues e solicitações de funcionalidades, bem como aceitar pull requests.
+
+1. Faça um fork do repositório e crie sua branch a partir da `main`
+2. Se você adicionou código que precisa ser testado, adicione testes
+3. Se você alterou APIs, atualize a documentação
+4. Certifique-se de que a suite de testes passa
+5. Certifique-se de que seu código segue nossos padrões de codificação
+6. Envie o pull request!
+
+## Mensagens de Commit Semânticas
+
+Usamos commits semânticos para automatizar nosso processo de release. Cada mensagem de commit deve ser estruturada da seguinte forma:
+
+```
+<tipo>(<escopo>): <descrição>
+
+[corpo opcional]
+
+[rodapé(s) opcional(is)]
+```
+
+### Tipos
+
+- `feat`: Uma nova funcionalidade (incrementa versão MINOR)
+- `fix`: Uma correção de bug (incrementa versão PATCH)
+- `docs`: Alterações apenas na documentação
+- `style`: Alterações que não afetam o significado do código
+- `refactor`: Uma alteração de código que não corrige um bug nem adiciona uma funcionalidade
+- `perf`: Uma alteração de código que melhora o desempenho
+- `test`: Adicionando testes ausentes ou corrigindo testes existentes
+- `build`: Alterações que afetam o sistema de build ou dependências externas
+- `ci`: Alterações em nossos arquivos e scripts de configuração de CI
+
+### Mudanças Quebra de Compatibilidade
+
+Quando um commit inclui uma mudança que quebra compatibilidade, ele DEVE:
+1. Ter um `!` após o tipo/escopo: `feat!: remove suporte para Node 6`
+2. Incluir `BREAKING CHANGE:` no rodapé:
+
+```
+feat!: remove suporte para Node 6
+
+BREAKING CHANGE: usa recursos JavaScript não disponíveis no Node 6.
+```
+
+### Exemplos
+
+```bash
+feat: adiciona suporte para arquivos criptografados
+fix: resolve vazamento de memória no processo de criptografia
+docs: atualiza instruções de instalação
+style: formata código de acordo com novo guia de estilo
+refactor: reestrutura módulo de criptografia
+perf: melhora performance na leitura de arquivos
+test: adiciona testes para processo de descriptografia
+build: atualiza dependências
+ci: adiciona workflow do GitHub Actions
+```
+
+## Processo de Release
+
+Usamos standard-version para gerenciar nossas releases. O processo é automatizado:
+
+```bash
+# Para correções de bugs
+npm run release:patch    # 1.0.0 -> 1.0.1
+
+# Para novas funcionalidades
+npm run release:minor    # 1.0.0 -> 1.1.0
+
+# Para mudanças que quebram compatibilidade
+npm run release:major    # 1.0.0 -> 2.0.0
+```
+
+O processo de release irá:
+1. Atualizar os números de versão
+2. Gerar CHANGELOG.md
+3. Criar uma tag git
+4. Enviar alterações e tags para o GitHub
+
+## Processo de Pull Request
+
+1. Atualize o README.md com detalhes das alterações, se necessário
+2. Atualize o CHANGELOG.md com notas sobre suas alterações
+3. O PR será mesclado depois que você tiver a aprovação de pelo menos um mantenedor
+
+## Alguma Dúvida?
+
+Sinta-se à vontade para abrir uma issue com sua dúvida ou sugestão. Estamos sempre felizes em ajudar! 
