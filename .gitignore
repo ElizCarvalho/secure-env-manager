@@ -1,0 +1,19 @@
+# Environment files
+*.env                        # Unencrypted .env files
+**/.env.*                    # All .env files in any directory
+!**/.env.*.enc              # ALLOW encrypted files (.env.*.enc)
+
+# Executables and binaries
+secure-env                   # Compiled binary
+*.exe                        # Windows executables
+
+# Go development files
+*.test                      # Go test files
+*.out                       # Test output files
+
+# Development directories
+/vendor/                    # Vendored dependencies
+/.idea/                     # JetBrains IDEs settings
+/.vscode/                   # VS Code settings
+/test-output/              # Test output directory
+/.cache/                   # Cache directory
