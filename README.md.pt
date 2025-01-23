@@ -2,6 +2,38 @@
 
 Uma ferramenta CLI para gerenciar arquivos .env de forma segura usando criptografia AES-GCM.
 
+## Estratégia de Autenticação
+
+A aplicação usa uma estratégia de autenticação simples, mas efetiva:
+
+1. **Variáveis de Ambiente**: As credenciais iniciais são definidas através de variáveis de ambiente:
+   - `SECURE_ENV_INITIAL_USER`: Nome de usuário para autenticação
+   - `SECURE_ENV_INITIAL_PASS`: Senha para autenticação e criptografia
+
+2. **Autenticação via Linha de Comando**: Os usuários devem fornecer credenciais ao executar o programa:
+   ```bash
+   make run USER=username PASS=password
+   ```
+
+3. **Processo de Validação**:
+   - As credenciais são validadas contra as variáveis de ambiente
+   - A senha também é usada como chave de criptografia para AES-GCM
+   - Todos os membros da equipe devem usar as mesmas credenciais para garantir o compartilhamento de arquivos
+
+4. **Medidas de Segurança**:
+   - As credenciais nunca são armazenadas em texto puro
+   - O arquivo de configuração é protegido contra modificações
+   - Cada sessão requer reautenticação
+
+### Por que Credenciais Pré-configuradas?
+
+A decisão de usar credenciais pré-configuradas em vez de um sistema de registro de usuários foi tomada por várias razões:
+
+1. **Sincronização da Equipe**: Como a ferramenta é projetada para uso em equipe, ter credenciais compartilhadas garante que todos os membros possam criptografar/descriptografar arquivos usando a mesma chave.
+2. **Gerenciamento Simplificado de Chaves**: Usar um único conjunto de credenciais elimina a complexidade de gerenciar múltiplas chaves de criptografia e compartilhar arquivos entre usuários.
+3. **Segurança por Processo**: O modelo de segurança depende da distribuição adequada de credenciais através de canais seguros da equipe, em vez de um sistema de registro de usuários potencialmente vulnerável.
+4. **Superfície de Ataque Reduzida**: Ao não implementar registro e gerenciamento de usuários, eliminamos potenciais vulnerabilidades de segurança associadas a essas funcionalidades.
+
 ## Executando o Programa
 
 1. Clone o repositório:

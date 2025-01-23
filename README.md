@@ -2,6 +2,38 @@
 
 A CLI tool for securely managing .env files using AES-GCM encryption.
 
+## Authentication Strategy
+
+The application uses a simple but effective authentication strategy:
+
+1. **Environment Variables**: Initial credentials are set through environment variables:
+   - `SECURE_ENV_INITIAL_USER`: Username for authentication
+   - `SECURE_ENV_INITIAL_PASS`: Password for authentication and encryption
+
+2. **Command Line Authentication**: Users must provide credentials when running the program:
+```bash
+make run USER=username PASS=password
+```
+
+3. **Validation Process**:
+   - Credentials are validated against the environment variables
+   - The password is also used as the encryption key for AES-GCM
+   - All team members must use the same credentials to ensure file sharing
+
+4. **Security Measures**:
+   - Credentials are never stored in plain text
+   - The configuration file is protected against modifications
+   - Each session requires re-authentication
+
+### Why Pre-configured Credentials?
+
+The decision to use pre-configured credentials instead of a user registration system was made for several reasons:
+
+1. **Team Synchronization**: Since the tool is designed for team use, having shared credentials ensures all team members can encrypt/decrypt files using the same key.
+2. **Simplified Key Management**: Using a single set of credentials eliminates the complexity of managing multiple encryption keys and sharing files between users.
+3. **Security by Process**: The security model relies on proper credential distribution through secure team channels, rather than a potentially vulnerable user registration system.
+4. **Reduced Attack Surface**: By not implementing user registration and management, we eliminate potential security vulnerabilities associated with these features.
+
 ## Running the Program
 
 1. Clone the repository:
