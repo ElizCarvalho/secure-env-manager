@@ -1,0 +1,87 @@
+version: 1
+
+project_name: secure-env
+
+before:
+  hooks:
+    - go mod tidy    # Ensure dependencies are up to date
+
+builds:
+  - env:
+      - CGO_ENABLED=0    # Build static binary
+    goos: # Target operating systems
+      - linux    # Linux systems
+      - windows  # Windows systems
+      - darwin   # macOS systems
+    goarch:      # CPU architectures
+      - amd64    # Intel/AMD 64-bit (x86_64)
+      - arm64    # ARM 64-bit (Apple Silicon M1/M2, AWS Graviton)
+    ignore:
+      - goos: windows    # Windows on ARM is not common yet
+        goarch: arm64
+    ldflags:
+      - -s -w                              # Strip debug info
+      - -X main.version={{.Version}}       # Inject version
+      - -X main.commit={{.ShortCommit}}    # Inject git commit (short)
+      - -X main.date={{.CommitDate}}       # Inject build date
+    binary: secure-env
+
+dockers:
+  - image_templates:
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}:{{ .Version }}"    # Tagged version
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}:latest"            # Latest version
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.description=Secure Environment Variables Manager"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.source=https://github.com/{{ .Env.GITHUB_REPOSITORY }}"
+      - "--label=org.opencontainers.image.licenses=MIT"
+
+archives:
+  - format: tar.gz    # Default compression format
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip    # Windows users expect ZIP files
+    files:            # Files to include in archive
+      - LICENSE
+      - README.md
+      - secure-env
+
+checksum:
+  name_template: 'checksums.txt'    # SHA256 checksums file
+  algorithm: sha256                 # Explicitly set algorithm
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"    # For development builds
+
+changelog:
+  sort: asc    # Chronological order
+  filters:
+    exclude:
+      - '^docs:'           # Documentation changes
+      - '^test:'           # Test changes
+      - '^ci:'            # CI changes
+      - Merge pull request
+      - Merge branch
+      - go mod tidy
+
+release:
+  github:
+    owner: "{{ .Env.GITHUB_REPOSITORY_OWNER }}"
+    name: "{{ .Env.GITHUB_REPOSITORY }}"
+  draft: false
+  prerelease: auto    # Auto-detect based on version string
+  mode: replace       # Replace existing release with same tag
+  header: |
+    ## Secure ENV Manager {{ .Version }}
+    
+    For installation and usage instructions, see the [README.md](README.md). 
